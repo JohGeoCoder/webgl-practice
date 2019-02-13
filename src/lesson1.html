@@ -1,7 +1,7 @@
 <html>
     <body>
         <canvas id="glCanvas" width="640" height="480"></canvas>
-    
+        <script src="js/gl-matrix.js"></script>
         <script>
             main();
     
@@ -51,6 +51,13 @@
                         modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
                     },
                 };
+
+                // Here's where we call the routine that builds all the
+                // objects we'll be drawing.
+                const buffers = initBuffers(gl);
+
+                // Draw the scene
+                drawScene(gl, programInfo, buffers);
             }
     
             //
@@ -98,7 +105,7 @@
                 return shader;  
             }
 
-            var initBuffers = (gl) => {
+            function initBuffers(gl) {
                 //Create a buffer for the square's positions.
                 const positionBuffer = gl.createBuffer();
 
