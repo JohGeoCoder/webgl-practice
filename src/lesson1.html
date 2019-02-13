@@ -10,8 +10,8 @@
             //
             function main() {
 
-                const canvas = document.querySelector("#glCanvas");
                 // Initialize the GL context
+                const canvas = document.querySelector("#glCanvas");
                 const gl = canvas.getContext("webgl");
     
                 // Only continue if WebGL is available and working
@@ -39,10 +39,6 @@
                     }
                 `;
 
-                // Initialize the GL context
-                const canvas = document.querySelector("#glCanvas");
-                const gl = canvas.getContext("webgl");
-
                 const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
                 const programInfo = {
@@ -65,14 +61,12 @@
                 const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
     
                 // Create the shader program
-    
                 const shaderProgram = gl.createProgram();
                 gl.attachShader(shaderProgram, vertexShader);
                 gl.attachShader(shaderProgram, fragmentShader);
                 gl.linkProgram(shaderProgram);
     
                 // If creating the shader program failed, alert
-                
                 if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
                     alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
                     return null;
@@ -137,7 +131,6 @@
                 gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
                 // Clear the canvas before we start drawing on it.
-
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
                 // Create a perspective matrix, a special matrix that is
@@ -167,7 +160,6 @@
 
                 // Now move the drawing position a bit to where we want to
                 // start drawing the square.
-
                 mat4.translate(modelViewMatrix,     // destination matrix
                                 modelViewMatrix,     // matrix to translate
                                 [-0.0, 0.0, -6.0]);  // amount to translate
