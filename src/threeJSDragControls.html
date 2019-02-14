@@ -10,6 +10,7 @@
 	</head>
 	<body>
         <script src="js/three.js"></script>
+        <script src="js/DragControls.js"></script>
 		<script>
 			var camera, scene, renderer;
 			var geometry, material, mesh;
@@ -40,13 +41,23 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
                 document.body.appendChild( renderer.domElement );
+
+                var dragContorls = new THREE.DragControls([mesh], camera, renderer.domElement);
+
+                //Required when camera rotation is present.
+                // dragControls.addEventListener('dragstart', function(){
+                //     controls.enabled = false;
+                // })
+                // dragControls.addEventListener('dragend', function(){
+                //     controls.enabled = true;
+                // })
                 
                 render();
 			}
 
 			function animate(){
 				requestAnimationFrame( animate );
-				controls.update();
+				render();
 			}
 
 			function render() {
