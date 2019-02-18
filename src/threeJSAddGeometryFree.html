@@ -19,7 +19,7 @@
 
             var canvasSize;
             var hoverObject = {
-                geometry: null,
+                object: null,
                 originalColor: null,
             };
 
@@ -62,6 +62,9 @@
 				rollOverMesh = new THREE.Mesh( rollOverCube, rollOverMaterial );
 				scene.add( rollOverMesh );
 
+                cubeGeo = new THREE.BoxBufferGeometry( 50,50,50 );
+                cubeMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 });
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
                 setCanvas();
@@ -87,16 +90,29 @@
 
                 setMouseProjection(event);
 
-                // raycaster.setFromCamera( mouse, camera );
-				// var geometryIntersects = raycaster.intersectObjects( objects );
-				// if ( geometryIntersects.length > 0 ) {
-				// 	var geometryIntersect = geometryIntersects[ 0 ];
-                //     var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-                //     voxel.position.copy( geometryIntersect.point ).add( geometryIntersect.face.normal );
-                //     voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-                //     scene.add( voxel );
-                //     objects.push( voxel );
-				// }
+                raycaster.setFromCamera( mouse, camera );
+				var geometryIntersects = raycaster.intersectObjects( geometryObjects );
+				if ( geometryIntersects.length > 0 ) {
+					// var geometryIntersect = geometryIntersects[ 0 ];
+                    // var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+                    // voxel.position.copy( geometryIntersect.point ).add( geometryIntersect.face.normal );
+                    // voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+                    // scene.add( voxel );
+                    // geometryObjects.push( voxel );
+				}
+                else{
+                    //Check if the mouse ray intersects with the plane.
+                    var planeIntersects = raycaster.intersectObjects([plane]);
+
+                    //If the mouse intersects with the plane, display the ghost cube at the position.
+                    if ( planeIntersects.length > 0 ) {
+                        var planeIntersect = planeIntersects[ 0 ];
+                        var newCube = new THREE.Mesh(cubeGeo, cubeMaterial);
+                        newCube.position.copy( planeIntersect.point ).add( planeIntersect.face.normal );
+                        scene.add(newCube);
+                        geometryObjects.push(newCube);
+                    }
+                }
             }
 
             function setCanvas(){
@@ -123,27 +139,27 @@
 					var geometryIntersect = geometryIntersects[ 0 ];
                     
                     //If the intersected object is newly intersected, update the state.
-                    if (geometryIntersect !== hoverObject.geometry){
+                    if (geometryIntersect.object !== hoverObject.object){
 
                         //If there was a previously intersected object, reset it's color to its original color.
-                        if(hoverObject.geometry){
-                            hoverObject.geometry.material.color.setHex(hoverObject.originalColor);
+                        if(hoverObject.object){
+                            hoverObject.object.material.color.setHex(hoverObject.originalColor);
                         }
                         
                         //Store the intersected object and its original color.
-                        hoverObject.geometry = geometryIntersect;
-                        hoverObject.originalColor = geometryIntersect.material.color.getHex();
+                        hoverObject.object = geometryIntersect.object;
+                        hoverObject.originalColor = geometryIntersect.object.material.color.getHex();
 
                         //Highlight the intersected object.
-                        geometryIntersect.material.color.setHex( 0xaa2299 );
+                        geometryIntersect.object.material.color.setHex( 0xaa2299 );
                     }
 				}
                 //If the mouse is not intersecting an object, display a ghost cube.
                 else{
                     //Reset any previously hovered object.
-                    if(hoverObject.geometry){
-                        hoverObject.geometry.material.color.setHex(hoverObject.originalColor);
-                        hoverObject.geometry = null;
+                    if(hoverObject.object){
+                        hoverObject.object.material.color.setHex(hoverObject.originalColor);
+                        hoverObject.object = null;
                         hoverObject.originalColor = null;
                     }
 
