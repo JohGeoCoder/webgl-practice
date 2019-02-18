@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			var camera, scene, renderer;
+            var plane, rollOverMesh;
+            var mouse, raycaster;
+
+            var cubeGeo, cubeMaterial;
+
+            var canvasSize;
+
+			var cameraX, cameraY, cameraZ;
+
+            var objects = [];
+
+			init();
+			animate();
+
+			function init() {
+				//camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 10000 );
+                var width = 1000;
+                var height = 1000;
+                camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 )
+
+				cameraX = 0;
+				cameraY = 800;
+				cameraZ = 0;
+                camera.position.set( cameraX, cameraY, cameraZ );
+				camera.lookAt( 0, 0, 0 );
+
+				scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0xf0f0f0 );
+
+                raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+
+                //Grid
+                var gridHelper = new THREE.GridHelper( 1000, 20 );
+				scene.add( gridHelper );
+
+                var planeGeometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+				planeGeometry.rotateX( - Math.PI / 2 );
+				plane = new THREE.Mesh( planeGeometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+				scene.add( plane );
+				objects.push( plane );
+
+                var rollOverCube = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+				rollOverMesh = new THREE.Mesh( rollOverCube, rollOverMaterial );
+				scene.add( rollOverMesh );
+
+                cubeGeo = new THREE.BoxBufferGeometry(50,50,50);
+                cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+                setCanvas();
+
+				document.body.appendChild( renderer.domElement );
+
+                document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+                window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+            function onWindowResize() {
+                setCanvas();
+			}
+
+            function onDocumentMouseMove( event ) {
+				event.preventDefault();
+                setMouseProjection(event);
+			}
+
+            function onDocumentMouseDown( event ) {
+                event.preventDefault();
+
+                setMouseProjection(event);
+
+                raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+                    var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+                    voxel.position.copy( intersect.point ).add( intersect.face.normal );
+                    voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+                    scene.add( voxel );
+                    objects.push( voxel );
+				}
+            }
+
+            function setCanvas(){
+                var squareRatio = 1;
+				camera.aspect = 1;
+				camera.updateProjectionMatrix();
+
+                canvasSize = Math.min(window.innerWidth, window.innerHeight);
+				renderer.setSize( canvasSize, canvasSize);
+            }
+
+            function setMouseProjection(event){
+                mouse.set(2 * event.clientX / canvasSize - 1, -2 * event.clientY / canvasSize + 1);
+            }
+
+			function animate() {
+				requestAnimationFrame( animate );
+				
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+				}
+				render();
+			}
+
+            function render(){
+                renderer.render( scene, camera );
+            }
+		</script>
+	</body>
+</html>
