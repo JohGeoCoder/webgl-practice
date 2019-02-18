@@ -12,29 +12,50 @@
 		<script src="js/three.js"></script>
 		<script>
 			var camera, scene, renderer;
-			var geometry, material, mesh;
+            var plane, cube;
 
 			var cameraX, cameraY, cameraZ;
 
+            var objects = [];
+
 			init();
-			animate();
+            render();
+			//animate();
 
 			function init() {
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 10000 );
 
-				cameraX = 100;
-				cameraY = 100;
-				cameraZ = 100;
+				cameraX = 500;
+				cameraY = 800;
+				cameraZ = 1300;
+                camera.position.set( cameraX, cameraY, cameraZ );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0xf0f0f0 );
 
-				geometry = new THREE.BoxGeometry( 20, 20, 20 );
-				material = new THREE.MeshNormalMaterial();
+                //Grid
+                var gridHelper = new THREE.GridHelper( 1000, 20 );
+				scene.add( gridHelper );
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+                var planeGeometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+				planeGeometry.rotateX( - Math.PI / 2 );
+				plane = new THREE.Mesh( planeGeometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+				scene.add( plane );
+				objects.push( plane );
+
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), new THREE.MeshNormalMaterial() );
+				scene.add( cube );
+
+                // var ambientLight = new THREE.AmbientLight( 0x606060 );
+				// scene.add( ambientLight );
+
+                // var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				// directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
+				// scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 			}
@@ -42,8 +63,7 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				
-				camera.position.set( cameraX, cameraY, cameraZ );
-				camera.lookAt( 0, 0, 0 );
+				
 
                 render();
 			}
