@@ -16,10 +16,14 @@
             var mouse, raycaster;
 
             var canvasSize;
+
             var hoverObject = {
                 object: null,
                 originalColor: null,
             };
+
+            var displayRolloverMesh = false;
+            var rolloverMesh;
 
 			var cameraX, cameraY, cameraZ;
 
@@ -135,6 +139,8 @@
 
                 //If the mouse is intersecting an object, highlight the object.
                 if ( geometryIntersects.length > 0 ) {
+                    displayRolloverMesh = false;
+
 					var geometryIntersect = geometryIntersects[ 0 ];
                     
                     //If the intersected object is newly intersected, update the state.
@@ -155,13 +161,17 @@
 				}
                 //If the mouse is not intersecting an object, display a ghost cube.
                 else{
+                    displayRolloverMesh = true;
+
                     //Reset any previously hovered object.
                     if(hoverObject.object){
                         hoverObject.object.material.color.setHex(hoverObject.originalColor);
                         hoverObject.object = null;
                         hoverObject.originalColor = null;
                     }
+                }
 
+                if(displayRolloverMesh){
                     //Check if the mouse ray intersects with the plane.
                     var planeIntersects = raycaster.intersectObjects([plane]);
 
@@ -169,7 +179,10 @@
                     if ( planeIntersects.length > 0 ) {
                         var planeIntersect = planeIntersects[ 0 ];
                         rollOverMesh.position.copy( planeIntersect.point ).add( planeIntersect.face.normal );
+                        rollOverMesh.material.opacity = 0.5;
                     }
+                } else{
+                    rollOverMesh.material.opacity = 0.0;
                 }
 				
 				render();
