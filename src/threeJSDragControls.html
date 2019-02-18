@@ -38,11 +38,15 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
+				var mesh2 = new THREE.Mesh( geometry, material );
+				mesh2.position.x = 0.6;
+				scene.add( mesh2 );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
                 document.body.appendChild( renderer.domElement );
 
-                var dragContorls = new THREE.DragControls([mesh], camera, renderer.domElement);
+                var dragContorls = new THREE.DragControls([mesh,mesh2], camera, renderer.domElement);
 
                 //Required when camera rotation is present.
                 // dragControls.addEventListener('dragstart', function(){
