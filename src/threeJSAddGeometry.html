@@ -109,7 +109,7 @@
             }
 
             function setMouseProjection(event){
-                mouse.set((2 * event.clientX - canvasSize) / canvasSize, (-2 * event.clientY + canvasSize) / canvasSize);
+                mouse.set(2 * event.clientX / canvasSize - 1, -2 * event.clientY / canvasSize + 1);
             }
 
 			function animate() {
