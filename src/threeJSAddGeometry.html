@@ -15,6 +15,8 @@
             var plane, rollOverMesh;
             var mouse, raycaster;
 
+            var cubeGeo, cubeMaterial;
+
             var canvasSize;
 
 			var cameraX, cameraY, cameraZ;
@@ -57,6 +59,9 @@
 				rollOverMesh = new THREE.Mesh( rollOverCube, rollOverMaterial );
 				scene.add( rollOverMesh );
 
+                cubeGeo = new THREE.BoxBufferGeometry(50,50,50);
+                cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
                 setCanvas();
@@ -64,6 +69,7 @@
 				document.body.appendChild( renderer.domElement );
 
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                document.addEventListener( 'mousedown', onDocumentMouseDown, false );
                 window.addEventListener( 'resize', onWindowResize, false );
 			}
 
@@ -73,8 +79,25 @@
 
             function onDocumentMouseMove( event ) {
 				event.preventDefault();
-                mouse.set((2 * event.clientX - canvasSize) / canvasSize, (-2 * event.clientY + canvasSize) / canvasSize);
+                setMouseProjection(event);
 			}
+
+            function onDocumentMouseDown( event ) {
+                event.preventDefault();
+
+                setMouseProjection(event);
+
+                raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+                    var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+                    voxel.position.copy( intersect.point ).add( intersect.face.normal );
+                    voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+                    scene.add( voxel );
+                    objects.push( voxel );
+				}
+            }
 
             function setCanvas(){
                 var squareRatio = 1;
@@ -83,6 +106,10 @@
 
                 canvasSize = Math.min(window.innerWidth, window.innerHeight);
 				renderer.setSize( canvasSize, canvasSize);
+            }
+
+            function setMouseProjection(event){
+                mouse.set((2 * event.clientX - canvasSize) / canvasSize, (-2 * event.clientY + canvasSize) / canvasSize);
             }
 
 			function animate() {
