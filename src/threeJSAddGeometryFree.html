@@ -9,7 +9,8 @@
 		</style>
 	</head>
 	<body>
-		<script src="js/three.js"></script>
+        <script src="js/three.js"></script>
+        <script src="js/DragControls.js"></script>
 		<script>
 			var camera, scene, renderer;
             var plane, rollOverMesh;
@@ -111,6 +112,8 @@
                         var cubeMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 });
                         var newCube = new THREE.Mesh(cubeGeo, cubeMaterial);
                         newCube.position.copy( planeIntersect.point ).add( planeIntersect.face.normal );
+
+                        new THREE.DragControls([newCube], camera, renderer.domElement);
 
                         scene.add(newCube);
                         geometryObjects.push(newCube);
